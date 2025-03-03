@@ -1,104 +1,107 @@
 import React from "react";
-import { View, Text, TouchableOpacity, FlatList, StyleSheet } from "react-native";
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { NavigationContainer } from "@react-navigation/native";
-import Icon from "react-native-vector-icons/FontAwesome";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import { Card, Avatar, Button } from "react-native-paper";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import CustomHeader from "./CustomHeader";
 
-const HomeScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Home</Text>
-      <Text style={styles.subtitle}>Welcome to the Blood Donation App</Text>
-      <TouchableOpacity style={styles.requestButton}>
-        <Text style={styles.buttonText}>Request Blood</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.donateButton}>
-        <Text style={styles.buttonText}>Donate Blood</Text>
-      </TouchableOpacity>
-    </View>
-  );
+const Home = ({ navigation }) => {
+    return (
+        <View style={styles.container}>
+            <CustomHeader title="Home" />
+
+            <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+                {/* Quick Actions */}
+                <View style={styles.quickActions}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("RequestMenu")}>
+                        <Icon name="blood-bag" size={30} color="#e74c3c" />
+                        <Text style={styles.actionText}>New Request</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("DonorMenu")}>
+                        <Icon name="account-plus" size={30} color="#27ae60" />
+                        <Text style={styles.actionText}>Become Donor</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("BloodBankMenu")}>
+                        <Icon name="hospital-building" size={30} color="#3498db" />
+                        <Text style={styles.actionText}>Find Blood Bank</Text>
+                    </TouchableOpacity>
+                </View>
+
+                {/* Overview Cards */}
+                <Card style={styles.card}>
+                    <Card.Title title="Total Requests" left={(props) => <Avatar.Icon {...props} icon="blood-bag" />} />
+                    <Card.Content>
+                        <Text style={styles.cardText}>120 Active Requests</Text>
+                    </Card.Content>
+                </Card>
+
+                <Card style={styles.card}>
+                    <Card.Title title="Available Donors" left={(props) => <Avatar.Icon {...props} icon="account-group" />} />
+                    <Card.Content>
+                        <Text style={styles.cardText}>350 Registered Donors</Text>
+                    </Card.Content>
+                </Card>
+
+                <Card style={styles.card}>
+                    <Card.Title title="Nearby Blood Banks" left={(props) => <Avatar.Icon {...props} icon="hospital" />} />
+                    <Card.Content>
+                        <Text style={styles.cardText}>15 Blood Banks Found</Text>
+                    </Card.Content>
+                </Card>
+
+                {/* Donate Button */}
+                <Button mode="contained" style={styles.donateButton} onPress={() => navigation.navigate("Donors")}>
+                    Donate Blood Now
+                </Button>
+            </ScrollView>
+        </View>
+    );
 };
-
-const ProfileScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Profile</Text>
-      <Text style={styles.subtitle}>User Name: John Doe</Text>
-      <Text>Email: johndoe@example.com</Text>
-      <Text>Blood Group: O+</Text>
-      <TouchableOpacity style={styles.editButton}>
-        <Text style={styles.buttonText}>Edit Profile</Text>
-      </TouchableOpacity>
-    </View>
-  );
-};
-
-const notifications = [
-  { id: "1", message: "New blood request in your area." },
-  { id: "2", message: "Your donation was successfully received." },
-];
-
-const NotificationScreen = () => {
-  return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Notifications</Text>
-      <FlatList
-        data={notifications}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.notificationItem}>
-            <Text>{item.message}</Text>
-          </View>
-        )}
-      />
-    </View>
-  );
-};
-
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    backgroundColor: "#fff",
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-  },
-  requestButton: {
-    backgroundColor: "#e74c3c",
-    padding: 10,
-    borderRadius: 5,
-    marginBottom: 10,
-  },
-  donateButton: {
-    backgroundColor: "#27ae60",
-    padding: 10,
-    borderRadius: 5,
-  },
-  editButton: {
-    backgroundColor: "#3498db",
-    padding: 10,
-    borderRadius: 5,
-    marginTop: 20,
-  },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  notificationItem: {
-    backgroundColor: "#ecf0f1",
-    padding: 10,
-    marginVertical: 5,
-    borderRadius: 5,
-    width: "100%",
-  },
+    container: {
+        flex: 1,
+        backgroundColor: "#f5f5f5",
+    },
+    content: {
+        padding: 16,
+    },
+    quickActions: {
+        flexDirection: "row",
+        justifyContent: "space-between",
+        marginBottom: 20,
+    },
+    actionButton: {
+        alignItems: "center",
+        backgroundColor: "#fff",
+        padding: 12,
+        borderRadius: 10,
+        width: "30%",
+        shadowColor: "#000",
+        shadowOpacity: 0.1,
+        shadowOffset: { width: 5, height: 2 },
+        elevation: 10,
+    },
+    actionText: {
+        marginTop: 5,
+        fontSize: 12,
+        fontWeight: "bold",
+    },
+    card: {
+        marginBottom: 16,
+        borderRadius: 10,
+        overflow: "hidden",
+    },
+    cardText: {
+        fontSize: 16,
+        fontWeight: "bold",
+        color: "#555",
+    },
+    donateButton: {
+        marginTop: 20,
+        backgroundColor: "#e74c3c",
+        padding: 10,
+        borderRadius: 10,
+    },
 });
+
+export default Home;
