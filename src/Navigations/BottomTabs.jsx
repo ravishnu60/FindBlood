@@ -40,6 +40,7 @@ const BottomTabs = () => {
                 tabBarActiveTintColor: "#e74c3c",
                 tabBarInactiveTintColor: "#7f8c8d",
             })}
+            backBehavior="history"
         >
             <Tab.Screen name="Home" component={Home} options={{ tabBarLabel: "Home" }} />
             <Tab.Screen name="RequestMenu" component={RequestNav} options={{ tabBarLabel: "Requests" }} />

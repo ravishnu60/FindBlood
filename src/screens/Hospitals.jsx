@@ -1,8 +1,10 @@
+import { useIsFocused } from "@react-navigation/native";
 import React, { useState, useEffect } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 // import MapView, { Marker } from "react-native-maps";
 // import Geolocation from "react-native-geolocation-service";
 import { Avatar, Card } from "react-native-paper";
+import { axiosInstance } from "../utils/axiosInstance";
 
 const hospitalsData = [
     { id: "1", name: "City Hospital", latitude: 37.7749, longitude: -122.4194, address: "123 Main St, San Francisco", phone: "123-456-7890" },
@@ -17,6 +19,22 @@ const Hospitals = ({ navigation }) => {
         latitudeDelta: 0.05,
         longitudeDelta: 0.05,
     });
+
+    const isFocused = useIsFocused();
+    const [hospitalList, setHospitalList] = useState([]);
+
+    const getRequest = () => {
+        axiosInstance.get('api/hospitals').then(res => {
+            setRequestList(res.data);
+            console.log("res", res.data);
+        }).catch(err => console.log("eror", err));
+    }
+
+    useEffect(() => {
+        if (isFocused) {
+            getRequest();
+        }
+    }, [isFocused])
 
     // useEffect(() => {
     //     Geolocation.getCurrentPosition(
