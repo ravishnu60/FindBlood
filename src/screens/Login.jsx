@@ -4,12 +4,14 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import axios from "axios";
+import { base_url } from "../utils/axiosInstance";
 
 const Login = ({ navigation }) => {
     const [secureText, setSecureText] = useState(true);
 
     const loginSchema = yup.object().shape({
-        email: yup.string().email("Invalid email format").required("Email is required"),
+        username: yup.string().email("Invalid email format").required("Email is required"),
         password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
     });
 
@@ -18,10 +20,34 @@ const Login = ({ navigation }) => {
     });
 
     const onSubmit = (data) => {
-        console.log("Login Data:", data);
-        navigation.navigate("HomeMenu");
+        const fm= new FormData();
+        fm.append('username', data.username);
+        fm.append('password', data.password);
+        console.log("Login Data:", data, fm.getAll());
+        
+        axios({
+            method: 'post',
+            url: `${base_url}/api/login`,
+            data: fm,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }).then(res => {
+            console.log("res", res.data);
+        }).catch(err => console.log("eror", err));
+        
+        // const getRequest = () => {        
+        //         axiosInstance.get('api/blood-requests').then(res => {
+        //             // setRequestList(res.data);
+        //             console.log("res", res.data);
+        //         }).catch(err => console.log("eror", err) );
+        //     }
+
+        //     getRequest();
     };
 
+    console.log(errors);
+    
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Login</Text>
@@ -30,7 +56,7 @@ const Login = ({ navigation }) => {
             <View style={styles.inputContainer}>
                 <Controller
                     control={control}
-                    name="email"
+                    name="username"
                     render={({ field: { onChange, value } }) => (
                         <TextInput
                             style={styles.input}
@@ -44,7 +70,7 @@ const Login = ({ navigation }) => {
                     )}
                 />
             </View>
-            {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+            {errors.username && <Text style={styles.errorText}>{errors.username.message}</Text>}
 
             {/* Password Field */}
             <View style={styles.inputContainer}>
@@ -88,7 +114,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: "center",
-        backgroundColor: "#f8f9fa",
+        backgroundColor: "#ffcccc",
         padding: 20,
     },
     title: {
