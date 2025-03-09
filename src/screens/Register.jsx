@@ -1,17 +1,25 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { bg_color } from "../utils/utils";
+import { bg_color, Loading } from "../utils/utils";
+import { Picker } from "@react-native-picker/picker";
+import axiosInstance from "../utils/axiosInstance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Register = ({ navigation }) => {
     const [secureText, setSecureText] = useState(true);
+    const [loading, setLoading] = useState(false);
 
     const registerSchema = yup.object().shape({
         name: yup.string().required("Name is required"),
         email: yup.string().email("Invalid email format").required("Email is required"),
+        phone: yup.string().matches(/^\d{10}$/, "Phone must be 10 digits").required("Phone is required"),
+        blood_group: yup.string().required("Blood Group is required"),
+        address: yup.string().required("Address is required"),
+        district: yup.string().required("District is required"),
         password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
     });
 
@@ -20,11 +28,20 @@ const Register = ({ navigation }) => {
     });
 
     const onSubmit = (data) => {
+
         console.log("Register Data:", data);
+        axiosInstance({
+            method: "post",
+            url: "api/register",
+            data: data
+        }).then(res => {
+            AsyncStorage.setItem('token', res.data.token);
+        }).catch(err => Alert.alert("Error", 'Something went wrong, please try again')).finally(() => setLoading(false));
     };
 
     return (
         <ImageBackground source={require("../assets/blood.png")} style={styles.container}>
+            <Loading visible={loading} />
             <View style={styles.formContainer}>
                 <Text style={styles.title}>Register</Text>
 
@@ -65,6 +82,81 @@ const Register = ({ navigation }) => {
                     />
                 </View>
                 {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+
+                {/* Mobile Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="phone"
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Mobile"
+                                placeholderTextColor="#888"
+                                value={value}
+                                onChangeText={onChange}
+                                keyboardType="phone-pad"
+                            />
+                        )}
+                    />
+                </View>
+                {errors.phone && <Text style={styles.errorText}>{errors.phone.message}</Text>}
+
+                <Controller
+                    control={control}
+                    name="blood_group"
+                    render={({ field: { onChange, value } }) => (
+                        <View style={styles.pickerContainer}>
+                            <Picker dropdownIconColor={"#ba1b1b"} selectedValue={value} onValueChange={onChange} style={[styles.picker, value ? { color: "#ba1b1b" } : {}]}>
+                                <Picker.Item label="Select Blood Group" value="" style={{ fontSize: 15 }} />
+                                <Picker.Item label="A+" value="A+" style={{ fontSize: 15 }} />
+                                <Picker.Item label="A-" value="A-" style={{ fontSize: 15 }} />
+                                <Picker.Item label="B+" value="B+" style={{ fontSize: 15 }} />
+                                <Picker.Item label="B-" value="B-" style={{ fontSize: 15 }} />
+                                <Picker.Item label="O+" value="O+" style={{ fontSize: 15 }} />
+                                <Picker.Item label="O-" value="O-" style={{ fontSize: 15 }} />
+                                <Picker.Item label="AB+" value="AB+" style={{ fontSize: 15 }} />
+                                <Picker.Item label="AB-" value="AB-" style={{ fontSize: 15 }} />
+                            </Picker>
+                        </View>
+                    )}
+                />
+                {errors.blood_group && <Text style={styles.errorText}>{errors.blood_group.message}</Text>}
+                {/* Address Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="address"
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Address"
+                                placeholderTextColor="#888"
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
+                </View>
+                {errors.address && <Text style={styles.errorText}>{errors.address.message}</Text>}
+
+                {/* District Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="district"
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                placeholder="District"
+                                placeholderTextColor="#888"
+                                value={value}
+                                onChangeText={onChange}
+                            />
+                        )}
+                    />
+                </View>
+                {errors.district && <Text style={styles.errorText}>{errors.district.message}</Text>}
 
                 {/* Password Field */}
                 <View style={styles.inputContainer}>
@@ -182,6 +274,8 @@ const styles = StyleSheet.create({
         color: "#007bff",
         fontWeight: "bold",
     },
+    pickerContainer: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, marginTop: 10 },
+    picker: { height: 50, width: "100%", color: '#838383' },
 });
 
 export default Register;

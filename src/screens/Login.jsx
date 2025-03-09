@@ -41,13 +41,13 @@ const Login = ({ navigation }) => {
 
         navigation.navigate("HomeMenu");
 
-        // const fm = new FormData();
-        // fm.append('email', data.username);
-        // fm.append('password', data.password);
+        const fm = new FormData();
+        fm.append('email', data.username);
+        fm.append('password', data.password);
 
         // axios({
         //     method: 'post',
-        //     url: `${base_url}/api/login`,
+        //     url: `https://3qh8wvsh-8000.inc1.devtunnels.ms/api/login`,
         //     data: fm,
         //     headers: {
         //         'Content-Type': 'multipart/form-data',

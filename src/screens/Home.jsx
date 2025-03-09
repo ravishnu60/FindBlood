@@ -1,16 +1,31 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from "react-native";
-import { Card, Avatar, Button } from "react-native-paper";
+import { Card, Avatar } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomHeader from "./CustomHeader";
 import DonateBlood from "./DonateBlood";
+import axiosInstance from "../utils/axiosInstance";
+import { set } from "react-hook-form";
 
 const Home = ({ navigation }) => {
     const [modalVisible, setModalVisible] = useState(false);
+    const [countDetails, setCountDetails] = useState({});
+    const [loading, setLoading] = useState(false);
+
+    const getCountDetails = () => {
+        setLoading(true);
+        axiosInstance.get('api/get-count-details').then(res => {
+            setCountDetails(res.data);
+        }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
+    }
 
     const handleModalClose = () => {
         setModalVisible(false);
     };
+
+    useEffect(() => {
+        getCountDetails();
+    }, []);
 
     return (
         <View style={styles.container}>
