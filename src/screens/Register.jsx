@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { bg_color } from "../utils/utils";
 
 const Register = ({ navigation }) => {
     const [secureText, setSecureText] = useState(true);
@@ -23,82 +24,84 @@ const Register = ({ navigation }) => {
     };
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Register</Text>
+        <ImageBackground source={require("../assets/blood.png")} style={styles.container}>
+            <View style={styles.formContainer}>
+                <Text style={styles.title}>Register</Text>
 
-            {/* Name Field */}
-            <View style={styles.inputContainer}>
-                <Controller
-                    control={control}
-                    name="name"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Full Name"
-                            placeholderTextColor="#888"
-                            value={value}
-                            onChangeText={onChange}
-                        />
-                    )}
-                />
-            </View>
-            {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
-
-            {/* Email Field */}
-            <View style={styles.inputContainer}>
-                <Controller
-                    control={control}
-                    name="email"
-                    render={({ field: { onChange, value } }) => (
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Email"
-                            placeholderTextColor="#888"
-                            value={value}
-                            onChangeText={onChange}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                        />
-                    )}
-                />
-            </View>
-            {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
-
-            {/* Password Field */}
-            <View style={styles.inputContainer}>
-                <Controller
-                    control={control}
-                    name="password"
-                    render={({ field: { onChange, value } }) => (
-                        <View style={styles.passwordContainer}>
+                {/* Name Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="name"
+                        render={({ field: { onChange, value } }) => (
                             <TextInput
-                                style={styles.passwordInput}
-                                placeholder="Password"
+                                style={styles.input}
+                                placeholder="Full Name"
                                 placeholderTextColor="#888"
                                 value={value}
                                 onChangeText={onChange}
-                                secureTextEntry={secureText}
+                            />
+                        )}
+                    />
+                </View>
+                {errors.name && <Text style={styles.errorText}>{errors.name.message}</Text>}
+
+                {/* Email Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="email"
+                        render={({ field: { onChange, value } }) => (
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Email"
+                                placeholderTextColor="#888"
+                                value={value}
+                                onChangeText={onChange}
+                                keyboardType="email-address"
                                 autoCapitalize="none"
                             />
-                            <TouchableOpacity onPress={() => setSecureText(!secureText)}>
-                                <Icon name={secureText ? "eye-off" : "eye"} size={24} color="#888" />
-                            </TouchableOpacity>
-                        </View>
-                    )}
-                />
+                        )}
+                    />
+                </View>
+                {errors.email && <Text style={styles.errorText}>{errors.email.message}</Text>}
+
+                {/* Password Field */}
+                <View style={styles.inputContainer}>
+                    <Controller
+                        control={control}
+                        name="password"
+                        render={({ field: { onChange, value } }) => (
+                            <View style={styles.passwordContainer}>
+                                <TextInput
+                                    style={styles.passwordInput}
+                                    placeholder="Password"
+                                    placeholderTextColor="#888"
+                                    value={value}
+                                    onChangeText={onChange}
+                                    secureTextEntry={secureText}
+                                    autoCapitalize="none"
+                                />
+                                <TouchableOpacity onPress={() => setSecureText(!secureText)}>
+                                    <Icon name={secureText ? "eye-off" : "eye"} size={24} color="#888" />
+                                </TouchableOpacity>
+                            </View>
+                        )}
+                    />
+                </View>
+                {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
+
+                {/* Register Button */}
+                <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.registerButton}>
+                    <Text style={styles.buttonText}>Register</Text>
+                </TouchableOpacity>
+
+                {/* Login Navigation */}
+                <TouchableOpacity onPress={() => navigation.navigate("Login")}>
+                    <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink}>Login</Text></Text>
+                </TouchableOpacity>
             </View>
-            {errors.password && <Text style={styles.errorText}>{errors.password.message}</Text>}
-
-            {/* Register Button */}
-            <TouchableOpacity onPress={handleSubmit(onSubmit)} style={styles.registerButton}>
-                <Text style={styles.buttonText}>Register</Text>
-            </TouchableOpacity>
-
-            {/* Login Navigation */}
-            <TouchableOpacity onPress={() => navigation.navigate("Login")}>
-                <Text style={styles.loginText}>Already have an account? <Text style={styles.loginLink}>Login</Text></Text>
-            </TouchableOpacity>
-        </View>
+        </ImageBackground>
     );
 };
 
@@ -107,8 +110,14 @@ const styles = StyleSheet.create({
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: "#f8f9fa",
+        backgroundColor: bg_color,
         padding: 20,
+    },
+    formContainer: {
+        width: "100%",
+        backgroundColor: "#ffffffff",
+        padding: 20,
+        borderRadius: 10,
     },
     title: {
         fontSize: 24,
@@ -143,7 +152,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingVertical: 12,
         fontSize: 16,
-        color:'#000'
+        color: '#000'
     },
     errorText: {
         color: "#e74c3c",
@@ -167,6 +176,7 @@ const styles = StyleSheet.create({
     loginText: {
         fontSize: 14,
         marginTop: 15,
+        textAlign: "center",
     },
     loginLink: {
         color: "#007bff",

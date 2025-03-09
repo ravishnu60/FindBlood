@@ -1,51 +1,29 @@
-import { useIsFocused } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { Picker } from "@react-native-picker/picker";
-import { Card, Avatar } from "react-native-paper";
-import { axiosInstance } from "../utils/axiosInstance";
-import { bg_color } from "../utils/utils";
+import Fontawesome from "react-native-vector-icons/FontAwesome";
 
-const donorsData = [
-    { id: "1", name: "John Doe", bloodGroup: "A+", location: "New York", phone: "123-456-7890" },
-    { id: "2", name: "Jane Smith", bloodGroup: "B+", location: "Los Angeles", phone: "987-654-3210" },
-    { id: "3", name: "Michael Lee", bloodGroup: "O-", location: "Chicago", phone: "555-777-8888" },
-];
-
-const FindDonor = ({ navigation }) => {
+const FindDonors = ({ navigation }) => {
     const [bloodGroup, setBloodGroup] = useState("");
     const [location, setLocation] = useState("");
-    const [filteredDonors, setFilteredDonors] = useState(donorsData);
+    const [donors, setDonors] = useState([]);
 
-    const isFocused = useIsFocused();
-    const [donorList, setDonorList] = useState([]);
-
-    const getDonors = () => {
-        axiosInstance.get('api/donations').then(res => {
-            setDonorList(res.data);
-            console.log("res", res.data);
-        }).catch(err => console.log("eror", err));
-    }
-
-    useEffect(() => {
-        if (isFocused) {
-            getDonors();
-        }
-    }, [isFocused])
-
-    const searchDonors = () => {
-        const filtered = donorsData.filter(donor =>
-            (bloodGroup ? donor.bloodGroup === bloodGroup : true) &&
-            (location ? donor.location.toLowerCase().includes(location.toLowerCase()) : true)
-        );
-        setFilteredDonors(filtered);
+    const handleSearch = () => {
+        // Dummy data for demonstration (replace with API call)
+        const dummyDonors = [
+            { id: "1", name: "John Doe", bloodGroup: "O+", location: "New York" },
+            { id: "2", name: "Alice Smith", bloodGroup: "A+", location: "Los Angeles" },
+        ];
+        setDonors(dummyDonors);
     };
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Find Donors</Text>
-            <View style={{ flexDirection: 'row', columnGap: 10 }}>
-                {/* <Picker selectedValue={bloodGroup} onValueChange={setBloodGroup} style={{ flex:1, backgroundColor: "#ff5050" }}>
+            <Text style={styles.title}>Find Blood Donors</Text>
+
+            <Text style={styles.label}>Blood Group</Text>
+            <View style={styles.pickerContainer}>
+                <Picker selectedValue={bloodGroup} onValueChange={setBloodGroup} style={styles.picker}>
                     <Picker.Item label="Select Blood Group" value="" />
                     <Picker.Item label="A+" value="A+" />
                     <Picker.Item label="A-" value="A-" />
@@ -55,29 +33,33 @@ const FindDonor = ({ navigation }) => {
                     <Picker.Item label="O-" value="O-" />
                     <Picker.Item label="AB+" value="AB+" />
                     <Picker.Item label="AB-" value="AB-" />
-                </Picker> */}
-                <TextInput
-                    style={styles.input}
-                    placeholder="Search by name, blood group, location"
-                    placeholderTextColor={"#ff5050"}
-                    value={location}
-                    onChangeText={setLocation}
-                />
-                <TouchableOpacity style={styles.button} onPress={searchDonors}>
-                    <Text style={styles.buttonText}>Search</Text>
-                </TouchableOpacity>
+                </Picker>
             </View>
 
+            <Text style={styles.label}>Location</Text>
+            <TextInput
+                style={styles.input}
+                placeholderTextColor={"#515151"}
+                placeholder="Enter location"
+                value={location}
+                onChangeText={setLocation}
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleSearch}>
+                <Text style={styles.buttonText}>Search Donors</Text>
+            </TouchableOpacity>
+
             <FlatList
-                data={donorList}
+                data={donors}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
-                    <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("DonorDetails", { donor: item })}>
-                        <Card.Title
-                            title={item.donor?.name}
-                            subtitle={`Blood Group: ${item.blood_group} | Location: ${item.donor.address}`}
-                            left={(props) => <Avatar.Icon {...props} icon="heart" />}
-                        />
+                    <TouchableOpacity onPress={() => navigation.navigate("DonorDetails", { donor: item })} style={styles.list} >
+                        <View style={styles.donorCard} >
+                            <Text style={styles.donorName}>{item.name}</Text>
+                            <Text style={{ fontWeight: "bold" }}>Blood Group: <Text style={{ fontWeight: "bold", color: "#e74c3c" }}>{item.bloodGroup}</Text></Text>
+                            <Text style={{ fontWeight: "bold" }}>Location: <Text style={{ fontWeight: "normal", color: "#717171" }}>{item.location}</Text></Text>
+                        </View>
+                        <Fontawesome name="arrow-right" size={25} color="#959595" />
                     </TouchableOpacity>
                 )}
             />
@@ -86,12 +68,17 @@ const FindDonor = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-    container: { flex: 1, padding: 20, backgroundColor: bg_color },
-    title: { fontSize: 22, fontWeight: "bold", marginBottom: 10 },
-    input: { borderWidth: 1, borderColor: "#ff5050", padding: 10, borderRadius: 8, marginBottom: 10 },
-    button: { backgroundColor: "#e74c3c", padding: 12, borderRadius: 8, alignItems: "center", marginBottom: 10 },
+    container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+    title: { fontSize: 22, fontWeight: "bold", marginBottom: 20, textAlign: "center" },
+    label: { fontSize: 16, fontWeight: "bold", marginBottom: 5 },
+    input: { borderWidth: 1, borderColor: "#ccc", color: "#000", padding: 10, borderRadius: 5, marginBottom: 10 },
+    pickerContainer: { borderWidth: 1, borderColor: "#ccc", borderRadius: 5, marginBottom: 10 },
+    picker: { height: 50, width: "100%", color: "#000" },
+    button: { backgroundColor: "#e74c3c", padding: 15, borderRadius: 8, alignItems: "center", marginTop: 10 },
     buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
-    card: { marginBottom: 10, borderRadius: 10, backgroundColor: "#fff" },
+    donorCard: { flexDirection: "column", alignItems: "flex-start", rowGap: 5 },
+    donorName: { fontSize: 18, fontWeight: "bold" },
+    list : {flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, backgroundColor: "#f2f2f2", marginTop: 10, borderRadius: 8, padding: 10}
 });
 
-export default FindDonor;
+export default FindDonors;

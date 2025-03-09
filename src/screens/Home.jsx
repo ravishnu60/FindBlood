@@ -1,10 +1,17 @@
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { Card, Avatar, Button } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomHeader from "./CustomHeader";
+import DonateBlood from "./DonateBlood";
 
 const Home = ({ navigation }) => {
+    const [modalVisible, setModalVisible] = useState(false);
+
+    const handleModalClose = () => {
+        setModalVisible(false);
+    };
+
     return (
         <View style={styles.container}>
             <CustomHeader title="Home" />
@@ -16,7 +23,7 @@ const Home = ({ navigation }) => {
                         <Icon name="blood-bag" size={30} color="#e74c3c" />
                         <Text style={styles.actionText}>New Request</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("DonorMenu")}>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => setModalVisible(true)}>
                         <Icon name="account-plus" size={30} color="#27ae60" />
                         <Text style={styles.actionText}>Become Donor</Text>
                     </TouchableOpacity>
@@ -30,7 +37,7 @@ const Home = ({ navigation }) => {
                 <Card style={styles.card}>
                     <Card.Title title="Total Requests" left={(props) => <Avatar.Icon {...props} icon="blood-bag" />} />
                     <Card.Content>
-                        <Text style={styles.cardText}>120 Active Requests</Text>
+                        <Text style={styles.cardText}>5 Requests</Text>
                     </Card.Content>
                 </Card>
 
@@ -49,10 +56,17 @@ const Home = ({ navigation }) => {
                 </Card>
 
                 {/* Donate Button */}
-                <Button mode="contained" style={styles.donateButton} onPress={() => navigation.navigate("Donors")}>
+                {/* <Button mode="contained" style={styles.donateButton} onPress={() => navigation.navigate("Donors")}>
                     Donate Blood Now
-                </Button>
+                </Button> */}
             </ScrollView>
+            <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={handleModalClose}>
+                <View style={styles.modalContainer}>
+                    <View style={styles.modalContent}>
+                        <DonateBlood onClose={handleModalClose} />
+                    </View>
+                </View>
+            </Modal>
         </View>
     );
 };
@@ -101,6 +115,14 @@ const styles = StyleSheet.create({
         backgroundColor: "#e74c3c",
         padding: 10,
         borderRadius: 10,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: "center",
+        backgroundColor: "#fcadad80",
+    },
+    modalContent: {
+        margin: 20,
     },
 });
 

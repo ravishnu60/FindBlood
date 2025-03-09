@@ -23,18 +23,18 @@ const Hospitals = ({ navigation }) => {
     const isFocused = useIsFocused();
     const [hospitalList, setHospitalList] = useState([]);
 
-    const getRequest = () => {
-        axiosInstance.get('api/hospitals').then(res => {
-            setRequestList(res.data);
-            console.log("res", res.data);
-        }).catch(err => console.log("eror", err));
-    }
+    // const getRequest = () => {
+    //     axiosInstance.get('api/hospitals').then(res => {
+    //         setRequestList(res.data);
+    //         console.log("res", res.data);
+    //     }).catch(err => console.log("eror", err));
+    // }
 
-    useEffect(() => {
-        if (isFocused) {
-            getRequest();
-        }
-    }, [isFocused])
+    // useEffect(() => {
+    //     if (isFocused) {
+    //         getRequest();
+    //     }
+    // }, [isFocused])
 
     // useEffect(() => {
     //     Geolocation.getCurrentPosition(
@@ -72,8 +72,9 @@ const Hospitals = ({ navigation }) => {
                     <Card style={styles.card} onPress={() => navigation.navigate("HospitalDetails", { hospital: item })}>
                         <Card.Title
                             title={item.name}
-                            subtitle={`Address: ${item.bloodGroup} | Phone: ${item.location}`}
-                            left={(props) => <Avatar.Icon {...props} icon="account-heart" />}
+                            titleStyle={{fontWeight: 'bold'}}
+                            subtitle={`Address: ${item.address} | Phone: ${item.phone}`}
+                            left={(props) => <Avatar.Icon {...props} icon="hospital-building" />}
                         />
                     </Card>
                 )}
@@ -84,9 +85,9 @@ const Hospitals = ({ navigation }) => {
 
 const styles = StyleSheet.create({
     container: { flex: 1, backgroundColor: "#fff" },
-    title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginVertical: 10 },
+    title: { fontSize: 22, fontWeight: "bold", textAlign: "center", marginVertical: 15 },
     map: { flex: 1 },
-    card: { marginBottom: 10, borderRadius: 10, backgroundColor: "#fff", elevation: 3 },
+    card: { marginBottom: 10, borderRadius: 10, backgroundColor: "#e8e8e8", elevation: 3 },
 
 });
 

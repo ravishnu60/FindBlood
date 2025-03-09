@@ -9,19 +9,19 @@ const DonorDetails = ({ route }) => {
     return (
         <View style={styles.container}>
             <Avatar.Icon size={100} icon="account" style={styles.avatar} />
-            <View style={{ backgroundColor: "#fff", padding: 15, borderRadius: 10 }}>
+            <View style={{ backgroundColor: "#ffe3e3", padding: 15, borderRadius: 10 }}>
                 <Text style={styles.header}>Donor Name</Text>
-                <Text style={styles.text}>{donor.donor.name}</Text>
+                <Text style={styles.text}>{donor.name}</Text>
                 <Text style={styles.header}>Donor Address</Text>
-                <Text style={styles.text}> {donor.donor.address}</Text>
+                <Text style={styles.text}> {donor.location}</Text>
                 <Text style={styles.header}>Blood Group</Text>
-                <Text style={[styles.text, { color: 'red', fontWeight: 'bold' }]}>{donor.blood_group}</Text>
+                <Text style={[styles.text, { color: 'red', fontWeight: 'bold' }]}>{donor.bloodGroup}</Text>
                 <Text style={styles.header}>Status</Text>
-                <Text style={styles.text}>{donor.status}</Text>
-                <Text style={styles.header}>Date</Text>
-                <Text style={styles.text}>{new Date(donor.created_at).toLocaleString({ day: "numeric", month: "long", year: "numeric" })}</Text>
+                <Text style={styles.text}>{donor?.status || "Available"}</Text>
+                <Text style={styles.header}>Registered On</Text>
+                <Text style={styles.text}>{new Date().toDateString({ day: "numeric", month: "long", year: "numeric" })}</Text>
             </View>
-            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`tel:${donor.donor.phone}`)}>
+            <TouchableOpacity style={styles.button} onPress={() => Linking.openURL(`tel:${donor?.phone}`)}>
                 <Text style={styles.buttonText}>Call Donor</Text>
             </TouchableOpacity>
         </View>

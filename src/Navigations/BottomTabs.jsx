@@ -33,7 +33,7 @@ const BottomTabs = () => {
                         case "RequestMenu": iconName = "blood-bag"; break;
                         case "DonorMenu": iconName = "account-group"; break;
                         case "BloodBankMenu": iconName = "hospital"; break;
-                        case "SettingMenu": iconName = "cog"; break;
+                        case "SettingMenu": iconName = "account"; break;
                     }
                     return <Icon name={iconName} size={size} color={color} />;
                 },
@@ -46,7 +46,7 @@ const BottomTabs = () => {
             <Tab.Screen name="RequestMenu" component={RequestNav} options={{ tabBarLabel: "Requests" }} />
             <Tab.Screen name="DonorMenu" component={DonorNav} options={{ tabBarLabel: "Donors" }} />
             <Tab.Screen name="BloodBankMenu" component={HospitalNav} options={{ tabBarLabel: "Blood Banks" }} />
-            <Tab.Screen name="SettingMenu" component={SettingNav} options={{ tabBarLabel: "Settings" }} />
+            <Tab.Screen name="SettingMenu" component={SettingNav} options={{ tabBarLabel: "Profile" }} />
         </Tab.Navigator>
     );
 };
