@@ -14,7 +14,9 @@ const Home = ({ navigation }) => {
 
     const getCountDetails = () => {
         setLoading(true);
-        axiosInstance.get('api/get-count-details').then(res => {
+        axiosInstance.get('api/get/counts').then(res => {
+            console.log("res", res.data);
+            
             setCountDetails(res.data);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }
@@ -52,21 +54,21 @@ const Home = ({ navigation }) => {
                 <Card style={styles.card}>
                     <Card.Title title="Total Requests" left={(props) => <Avatar.Icon {...props} icon="blood-bag" />} />
                     <Card.Content>
-                        <Text style={styles.cardText}>5 Requests</Text>
+                        <Text style={styles.cardText}>{countDetails?.totalRequest} Requests</Text>
                     </Card.Content>
                 </Card>
 
                 <Card style={styles.card}>
                     <Card.Title title="Available Donors" left={(props) => <Avatar.Icon {...props} icon="account-group" />} />
                     <Card.Content>
-                        <Text style={styles.cardText}>350 Registered Donors</Text>
+                        <Text style={styles.cardText}>{countDetails?.donor} Registered Donors</Text>
                     </Card.Content>
                 </Card>
 
                 <Card style={styles.card}>
                     <Card.Title title="Nearby Blood Banks" left={(props) => <Avatar.Icon {...props} icon="hospital" />} />
                     <Card.Content>
-                        <Text style={styles.cardText}>15 Blood Banks Found</Text>
+                        <Text style={styles.cardText}>{countDetails?.hospital} Blood Banks Found</Text>
                     </Card.Content>
                 </Card>
 

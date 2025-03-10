@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { bg_color, Loading } from "../utils/utils";
+import { bg_color, bloodGroups, dropdownArrow, Loading } from "../utils/utils";
 import { Picker } from "@react-native-picker/picker";
 import axiosInstance from "../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -30,12 +30,15 @@ const Register = ({ navigation }) => {
     const onSubmit = (data) => {
 
         console.log("Register Data:", data);
+        setLoading(true);
         axiosInstance({
             method: "post",
             url: "api/register",
             data: data
         }).then(res => {
             AsyncStorage.setItem('token', res.data.token);
+            AsyncStorage.setItem('userID', res.data.user.id.toString());
+            navigation.navigate("HomeMenu");
         }).catch(err => Alert.alert("Error", 'Something went wrong, please try again')).finally(() => setLoading(false));
     };
 
@@ -53,7 +56,7 @@ const Register = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                             <TextInput
                                 style={styles.input}
-                                placeholder="Full Name"
+                                placeholder="Full Name *"
                                 placeholderTextColor="#888"
                                 value={value}
                                 onChangeText={onChange}
@@ -71,7 +74,7 @@ const Register = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                             <TextInput
                                 style={styles.input}
-                                placeholder="Email"
+                                placeholder="Email *"
                                 placeholderTextColor="#888"
                                 value={value}
                                 onChangeText={onChange}
@@ -91,7 +94,7 @@ const Register = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                             <TextInput
                                 style={styles.input}
-                                placeholder="Mobile"
+                                placeholder="Mobile *"
                                 placeholderTextColor="#888"
                                 value={value}
                                 onChangeText={onChange}
@@ -107,16 +110,13 @@ const Register = ({ navigation }) => {
                     name="blood_group"
                     render={({ field: { onChange, value } }) => (
                         <View style={styles.pickerContainer}>
-                            <Picker dropdownIconColor={"#ba1b1b"} selectedValue={value} onValueChange={onChange} style={[styles.picker, value ? { color: "#ba1b1b" } : {}]}>
+                            <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={[styles.picker, value ? { color: "#ba1b1b" } : {}]}>
                                 <Picker.Item label="Select Blood Group" value="" style={{ fontSize: 15 }} />
-                                <Picker.Item label="A+" value="A+" style={{ fontSize: 15 }} />
-                                <Picker.Item label="A-" value="A-" style={{ fontSize: 15 }} />
-                                <Picker.Item label="B+" value="B+" style={{ fontSize: 15 }} />
-                                <Picker.Item label="B-" value="B-" style={{ fontSize: 15 }} />
-                                <Picker.Item label="O+" value="O+" style={{ fontSize: 15 }} />
-                                <Picker.Item label="O-" value="O-" style={{ fontSize: 15 }} />
-                                <Picker.Item label="AB+" value="AB+" style={{ fontSize: 15 }} />
-                                <Picker.Item label="AB-" value="AB-" style={{ fontSize: 15 }} />
+                                {
+                                    bloodGroups.map((group, index) => (
+                                        <Picker.Item key={index} label={group.label} value={group.value} style={{ fontSize: 15 }} />
+                                    ))
+                                }
                             </Picker>
                         </View>
                     )}
@@ -130,7 +130,7 @@ const Register = ({ navigation }) => {
                         render={({ field: { onChange, value } }) => (
                             <TextInput
                                 style={styles.input}
-                                placeholder="Address"
+                                placeholder="Address *"
                                 placeholderTextColor="#888"
                                 value={value}
                                 onChangeText={onChange}
@@ -146,13 +146,16 @@ const Register = ({ navigation }) => {
                         control={control}
                         name="district"
                         render={({ field: { onChange, value } }) => (
-                            <TextInput
-                                style={styles.input}
-                                placeholder="District"
-                                placeholderTextColor="#888"
-                                value={value}
-                                onChangeText={onChange}
-                            />
+                            <View style={styles.pickerContainer}>
+                                <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={styles.picker}>
+                                    <Picker.Item label="Select District" value="" />
+                                    {
+                                        cities.map((city, index) => (
+                                            <Picker.Item key={index} label={city.label} value={city.value} />
+                                        ))
+                                    }
+                                </Picker>
+                            </View>
                         )}
                     />
                 </View>
@@ -167,7 +170,7 @@ const Register = ({ navigation }) => {
                             <View style={styles.passwordContainer}>
                                 <TextInput
                                     style={styles.passwordInput}
-                                    placeholder="Password"
+                                    placeholder="Password *"
                                     placeholderTextColor="#888"
                                     value={value}
                                     onChangeText={onChange}

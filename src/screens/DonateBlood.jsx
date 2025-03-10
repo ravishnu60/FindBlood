@@ -4,6 +4,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
+import { cities, dropdownArrow } from "../utils/utils";
 
 const DonateBlood = ({ onClose }) => {
     // Validation Schema
@@ -24,8 +25,8 @@ const DonateBlood = ({ onClose }) => {
 
     return (
         <View style={styles.container}>
-            <Text style={styles.title}>Donate Blood</Text>
-
+            <Text style={styles.title}>Become Donor</Text>
+            <Text style={{ fontWeight: "bold", textAlign: "center", color: "#1bb250", marginBottom: 15 }}>Be a hero, donate blood and save lives! ❤️💉</Text>
             {/* Blood Group Selection */}
             <Text style={styles.label}>Blood Group</Text>
             <Controller
@@ -33,7 +34,7 @@ const DonateBlood = ({ onClose }) => {
                 name="bloodGroup"
                 render={({ field: { onChange, value } }) => (
                     <View style={styles.pickerContainer}>
-                        <Picker selectedValue={value} onValueChange={onChange} style={styles.picker}>
+                        <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={styles.picker}>
                             <Picker.Item label="Select Blood Group" value="" />
                             <Picker.Item label="A+" value="A+" />
                             <Picker.Item label="A-" value="A-" />
@@ -65,6 +66,26 @@ const DonateBlood = ({ onClose }) => {
                 )}
             />
             {errors.location && <Text style={styles.errorText}>{errors.location.message}</Text>}
+
+            {/* District Field */}
+            <Text style={styles.label}>District *</Text>
+            <Controller
+                control={control}
+                name="district"
+                render={({ field: { onChange, value } }) => (
+                    <View style={styles.pickerContainer}>
+                        <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={styles.picker}>
+                            <Picker.Item label="Select District" value="" />
+                            {
+                                cities.map((city, index) => (
+                                    <Picker.Item key={index} label={city.label} value={city.value} />
+                                ))
+                            }
+                        </Picker>
+                    </View>
+                )}
+            />
+            {errors.district && <Text style={styles.error}>{errors.district.message}</Text>}
 
             {/* Submit Button */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>

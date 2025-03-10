@@ -7,24 +7,22 @@ import axiosInstance from "../utils/axiosInstance";
 
 const Requests = ({ navigation }) => {
     const isFocused = useIsFocused();
-    const [requestList, setRequestList] = useState([
-        { id: 1, bloodGroup: "A+", urgency: 'Urgent', status: "Pending", hospitalOrLocation: "City Hospital, chennai", date: "2023-08-01", notes: "I need blood urgently", donated_by: null },
-        { id: 2, bloodGroup: "B-", urgency: 'Normal', status: "Accepted", hospitalOrLocation: "Red Cross Center, chennai", date: "2023-08-02", notes: "I need blood for surgery", donated_by: 'Donor' },
-        { id: 3, bloodGroup: "O+", urgency: 'Urgent', status: "Accepted", hospitalOrLocation: "Don bosco college, chennai", date: "2023-08-03", notes: "I need blood for operation", donated_by: 'Hospital' },
-    ]);
+    const [requestList, setRequestList] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const getRequest = () => {
+        setLoading(true);
         axiosInstance.get('api/blood-requests').then(res => {
-            // setRequestList(res.data);
-            console.log("res", res.data);
-        }).catch(err => console.log("eror", err));
+            setRequestList(res.data);
+        }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }
 
     const getStatusColor = (status) => {
+        status = status.charAt(0).toUpperCase() + status.slice(1)
         switch (status) {
             case "Pending":
                 return "#0078b5";
-            case "Accepted":
+            case "Approved":
                 return "#06c206";
             case "Rejected":
                 return "#c10000";
@@ -34,6 +32,7 @@ const Requests = ({ navigation }) => {
     }
 
     const getUrgencyColor = (urgency) => {
+        urgency = urgency ? urgency.charAt(0).toUpperCase() + urgency.slice(1) : 'Normal';
         switch (urgency) {
             case "Urgent":
                 return "#c10000";
@@ -61,14 +60,15 @@ const Requests = ({ navigation }) => {
                         <Fontisto name="blood-drop" size={35} color="#bc2d2d" />
                         <View style={{}}>
                             <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Blood: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item.bloodGroup}</Text></Text>
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Level: <Text style={{ fontSize: 15, fontWeight: "bold", color: getUrgencyColor(item.urgency) }}>{item.urgency} </Text></Text>
+                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Blood: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item.blood_group}</Text></Text>
+                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Level: <Text style={{ fontSize: 15, fontWeight: "bold", color: getUrgencyColor(item.urgency) }}>{item.urgency_level || 'Normal'} </Text></Text>
                             </View>
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Notes: <Text style={{ fontSize: 13, fontWeight: "normal" }}>{item.notes}</Text></Text>
                             <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> place: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item.hospitalOrLocation}</Text></Text>
+                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Hospital: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item.hospital?.name}</Text></Text>
                             </View>
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Status: <Text style={{ fontSize: 15, fontWeight: "bold", color: getStatusColor(item.status) }}>{item.status}</Text></Text>
+                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Place: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item.hospital?.address} - {item.hospital?.district}</Text></Text>
+                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Notes: <Text style={{ fontSize: 13, fontWeight: "normal" }}>{item.additional_notes || 'No notes'}</Text></Text>
+                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Status: <Text style={{ fontSize: 15, fontWeight: "bold", color: getStatusColor(item.status) }}>{item.status === 'approved' ? 'Donated' : item.status.charAt(0).toUpperCase() + item.status.slice(1)}</Text></Text>
                             {item?.donated_by && <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Donated by: <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item.donated_by}</Text></Text>}
                         </View>
                     </View>

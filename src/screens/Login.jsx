@@ -27,10 +27,11 @@ const Login = ({ navigation }) => {
 
     const [secureText, setSecureText] = useState(true);
     const [loading, setLoading] = useState(false);
+    const [error, setError] = useState("");
 
 
     const onSubmit = (data) => {
-        // setLoading(true);
+        setLoading(true);
         if (data.remember) {
             AsyncStorage.setItem('username', data.username);
             AsyncStorage.setItem('password', data.password);
@@ -39,23 +40,26 @@ const Login = ({ navigation }) => {
             AsyncStorage.removeItem('password');
         }
 
-        navigation.navigate("HomeMenu");
+        // navigation.navigate("HomeMenu");
 
         const fm = new FormData();
         fm.append('email', data.username);
         fm.append('password', data.password);
 
-        // axios({
-        //     method: 'post',
-        //     url: `https://3qh8wvsh-8000.inc1.devtunnels.ms/api/login`,
-        //     data: fm,
-        //     headers: {
-        //         'Content-Type': 'multipart/form-data',
-        //     },
-        // }).then(res => {
-        //     console.log("res", res.data);
-        //     AsyncStorage.setItem('token', res.data.token);
-        // }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
+        axios({
+            method: 'post',
+            url: `${base_url}api/login`,
+            data: fm,
+            headers: {
+                'Content-Type': 'multipart/form-data',
+            },
+        }).then(res => {
+            AsyncStorage.setItem('token', res.data.token);
+            navigation.navigate("HomeMenu");
+        }).catch(err => {
+            console.log("eror", err);
+            setError("Invalid email or password");
+        }).finally(() => setLoading(false));
     };
 
     const patchValueIfExist = async () => {
@@ -84,6 +88,7 @@ const Login = ({ navigation }) => {
             <View style={styles.formContainer}>
                 <Loading visible={loading} />
                 <Text style={styles.title}>Login</Text>
+                {error ? <Text style={styles.errorText}>{error}</Text> : null}
                 {/* Email Field */}
                 <View style={styles.inputContainer}>
                     <Controller
@@ -209,7 +214,8 @@ const styles = StyleSheet.create({
     errorText: {
         color: "#e74c3c",
         fontSize: 14,
-        marginTop: 5
+        marginTop: 5,
+        textAlign: 'center'
     },
     loginButton: {
         backgroundColor: "#007bff",
