@@ -1,24 +1,32 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, ScrollView, TouchableOpacity, StyleSheet, Modal } from "react-native";
 import { Card, Avatar } from "react-native-paper";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import CustomHeader from "./CustomHeader";
 import DonateBlood from "./DonateBlood";
 import axiosInstance from "../utils/axiosInstance";
-import { set } from "react-hook-form";
+import { ContextData } from "../Navigations/MainNavigator";
+import { iconBg } from "../utils/utils";
+import DonorViewRequest from "./DonorViewRequest";
 
 const Home = ({ navigation }) => {
+    const contextVal = useContext(ContextData);
+
     const [modalVisible, setModalVisible] = useState(false);
     const [countDetails, setCountDetails] = useState({});
     const [loading, setLoading] = useState(false);
+    const [donorModal, setDonorModal] = useState(false);
 
     const getCountDetails = () => {
         setLoading(true);
         axiosInstance.get('api/get/counts').then(res => {
-            console.log("res", res.data);
-            
             setCountDetails(res.data);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
+    }
+    const getCurrentUser = () => {
+        axiosInstance.get('api/current-user').then(res => {
+            contextVal.setUser(res.data)
+        }).catch(err => console.log("eror", err));
     }
 
     const handleModalClose = () => {
@@ -27,7 +35,8 @@ const Home = ({ navigation }) => {
 
     useEffect(() => {
         getCountDetails();
-    }, []);
+        getCurrentUser();
+    }, [modalVisible]);
 
     return (
         <View style={styles.container}>
@@ -40,9 +49,9 @@ const Home = ({ navigation }) => {
                         <Icon name="blood-bag" size={30} color="#e74c3c" />
                         <Text style={styles.actionText}>New Request</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.actionButton} onPress={() => setModalVisible(true)}>
-                        <Icon name="account-plus" size={30} color="#27ae60" />
-                        <Text style={styles.actionText}>Become Donor</Text>
+                    <TouchableOpacity style={styles.actionButton} onPress={() => contextVal?.user?.is_donor ? setDonorModal(true) : setDonorModal(true)}>
+                        <Icon name={contextVal?.user?.is_donor ? "account-heart" : "account-plus"} size={30} color="#27ae60" />
+                        <Text style={styles.actionText}>{contextVal?.user?.is_donor ? "Donate Blood" : "Become Donor"}</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={styles.actionButton} onPress={() => navigation.navigate("BloodBankMenu")}>
                         <Icon name="hospital-building" size={30} color="#3498db" />
@@ -52,21 +61,31 @@ const Home = ({ navigation }) => {
 
                 {/* Overview Cards */}
                 <Card style={styles.card}>
-                    <Card.Title title="Total Requests" left={(props) => <Avatar.Icon {...props} icon="blood-bag" />} />
+                    <Card.Title title="Total Requests" left={(props) => <Avatar.Icon {...props} style={{ backgroundColor: iconBg }} icon="water" />} />
                     <Card.Content>
                         <Text style={styles.cardText}>{countDetails?.totalRequest} Requests</Text>
                     </Card.Content>
                 </Card>
+                {
+                    contextVal?.user?.is_donor ?
+                        <Card style={styles.card}>
+                            <Card.Title title="Total Donations" left={(props) => <Avatar.Icon {...props} style={{ backgroundColor: iconBg }} icon="blood-bag" />} />
+                            <Card.Content>
+                                <Text style={styles.cardText}>{countDetails?.donation} Donations</Text>
+                            </Card.Content>
+                        </Card>
+                        : ''
+                }
 
                 <Card style={styles.card}>
-                    <Card.Title title="Available Donors" left={(props) => <Avatar.Icon {...props} icon="account-group" />} />
+                    <Card.Title title="Available Donors" left={(props) => <Avatar.Icon {...props} style={{ backgroundColor: iconBg }} icon="account-group" />} />
                     <Card.Content>
                         <Text style={styles.cardText}>{countDetails?.donor} Registered Donors</Text>
                     </Card.Content>
                 </Card>
 
                 <Card style={styles.card}>
-                    <Card.Title title="Nearby Blood Banks" left={(props) => <Avatar.Icon {...props} icon="hospital" />} />
+                    <Card.Title title="Nearby Blood Banks" left={(props) => <Avatar.Icon {...props} style={{ backgroundColor: iconBg }} icon="hospital" />} />
                     <Card.Content>
                         <Text style={styles.cardText}>{countDetails?.hospital} Blood Banks Found</Text>
                     </Card.Content>
@@ -80,7 +99,14 @@ const Home = ({ navigation }) => {
             <Modal visible={modalVisible} animationType="slide" transparent={true} onRequestClose={handleModalClose}>
                 <View style={styles.modalContainer}>
                     <View style={styles.modalContent}>
-                        <DonateBlood onClose={handleModalClose} />
+                        <DonateBlood onClose={handleModalClose} currUser={contextVal?.user} />
+                    </View>
+                </View>
+            </Modal>
+            <Modal visible={donorModal} animationType="slide" transparent={true} onRequestClose={() => setDonorModal(false)}>
+                <View style={[styles.modalContainer, {backgroundColor:'#62e2ff50'}]}>
+                    <View style={[styles.modalContent, {flex: 1}]}>
+                        <DonorViewRequest onClose={()=> setDonorModal(false)} />
                     </View>
                 </View>
             </Modal>

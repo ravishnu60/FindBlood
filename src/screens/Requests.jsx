@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import Fontisto from "react-native-vector-icons/Fontisto";
-import { bg_color } from "../utils/utils";
+import { bg_color, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
 
 const Requests = ({ navigation }) => {
@@ -50,6 +50,7 @@ const Requests = ({ navigation }) => {
     }, [isFocused])
     return (
         <View style={styles.container}>
+            <Loading visible={loading} />
             <Text style={styles.title}>My Blood Requests</Text>
             <FlatList
                 data={requestList}

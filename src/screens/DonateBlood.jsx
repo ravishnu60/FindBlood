@@ -1,74 +1,73 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { cities, dropdownArrow } from "../utils/utils";
+import { bloodGroups, cities, dropdownArrow, Loading } from "../utils/utils";
+import axiosInstance from "../utils/axiosInstance";
 
-const DonateBlood = ({ onClose }) => {
+const DonateBlood = ({ onClose, currUser }) => {
+    const [loading, setLoading] = useState(false);
     // Validation Schema
     const donateSchema = yup.object().shape({
-        bloodGroup: yup.string().required("Blood group is required"),
-        location: yup.string().min(3, "Location must be at least 3 characters").required("Location is required"),
+        blood_group: yup.string().required("Blood group is required"),
+        district: yup.string().required("District is required"),
     });
 
     // React Hook Form setup
     const { control, handleSubmit, formState: { errors } } = useForm({
         resolver: yupResolver(donateSchema),
+        defaultValues: {
+            blood_group: currUser?.blood_group,
+            district: currUser?.district,
+        }
     });
 
     const onSubmit = (data) => {
-        Alert.alert("Success", `You have registered as a donor!\nBlood Group: ${data.bloodGroup}\nLocation: ${data.location}`);
-        onClose();
+        setLoading(true);
+        axiosInstance({
+            method: "POST",
+            url: "api/become-donor",
+            data: data
+        }).then((res) => {
+            console.log(res);
+            Alert.alert("You are a Donor!", `You have registered as a donor!\nBlood Group: ${data.blood_group}\nLocation: ${data.district}`);
+        }).catch((err) => {
+            Alert.alert("Error", "Something went wrong, please try again later!");
+        }).finally(() => {
+            setLoading(false);
+            onClose();
+        });
     };
 
     return (
         <View style={styles.container}>
+            <Loading visible={loading} />
             <Text style={styles.title}>Become Donor</Text>
             <Text style={{ fontWeight: "bold", textAlign: "center", color: "#1bb250", marginBottom: 15 }}>Be a hero, donate blood and save lives! ❤️💉</Text>
             {/* Blood Group Selection */}
             <Text style={styles.label}>Blood Group</Text>
             <Controller
                 control={control}
-                name="bloodGroup"
+                name="blood_group"
                 render={({ field: { onChange, value } }) => (
                     <View style={styles.pickerContainer}>
-                        <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={styles.picker}>
-                            <Picker.Item label="Select Blood Group" value="" />
-                            <Picker.Item label="A+" value="A+" />
-                            <Picker.Item label="A-" value="A-" />
-                            <Picker.Item label="B+" value="B+" />
-                            <Picker.Item label="B-" value="B-" />
-                            <Picker.Item label="O+" value="O+" />
-                            <Picker.Item label="O-" value="O-" />
-                            <Picker.Item label="AB+" value="AB+" />
-                            <Picker.Item label="AB-" value="AB-" />
+                        <Picker dropdownIconColor={dropdownArrow} selectedValue={value} onValueChange={onChange} style={[styles.picker, value ? { color: "#ba1b1b" } : {}]}>
+                            <Picker.Item label="Select Blood Group" value="" style={{ fontSize: 15 }} />
+                            {
+                                bloodGroups.map((group, index) => (
+                                    <Picker.Item key={index} label={group.label} value={group.value} style={{ fontSize: 15 }} />
+                                ))
+                            }
                         </Picker>
                     </View>
                 )}
             />
-            {errors.bloodGroup && <Text style={styles.errorText}>{errors.bloodGroup.message}</Text>}
+            {errors.blood_group && <Text style={styles.errorText}>{errors.blood_group.message}</Text>}
 
-            {/* Location Input */}
-            <Text style={styles.label}>Location</Text>
-            <Controller
-                control={control}
-                name="location"
-                render={({ field: { onChange, value } }) => (
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Enter location"
-                        placeholderTextColor="#545454"
-                        value={value}
-                        onChangeText={onChange}
-                    />
-                )}
-            />
-            {errors.location && <Text style={styles.errorText}>{errors.location.message}</Text>}
-
-            {/* District Field */}
-            <Text style={styles.label}>District *</Text>
+            {/* District Input */}
+            <Text style={styles.label}>District</Text>
             <Controller
                 control={control}
                 name="district"
@@ -85,7 +84,7 @@ const DonateBlood = ({ onClose }) => {
                     </View>
                 )}
             />
-            {errors.district && <Text style={styles.error}>{errors.district.message}</Text>}
+            {errors.district && <Text style={styles.errorText}>{errors.district.message}</Text>}
 
             {/* Submit Button */}
             <TouchableOpacity style={styles.button} onPress={handleSubmit(onSubmit)}>

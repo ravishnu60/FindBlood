@@ -1,10 +1,11 @@
 export const bg_color = "#fff";
-export const dropdownArrow = "#ba1b1b"
+export const dropdownArrow = "#ba1b1b";
+export const iconBg= "#de2323";
 
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
-export const base_url = "https://8f73-182-60-28-67.ngrok-free.app/";
+export const base_url = "https://3667-117-251-47-241.ngrok-free.app/";
 
 export const Loading = ({ visible }) => {
     return (

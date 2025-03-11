@@ -7,7 +7,6 @@ import { Picker } from "@react-native-picker/picker";
 import { useIsFocused } from "@react-navigation/native";
 import { bloodGroups, cities, dropdownArrow } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
-import { get } from "react-native/Libraries/TurboModule/TurboModuleRegistry";
 
 const requestSchema = yup.object().shape({
     blood_group: yup.string().required("Blood Group is required"),
@@ -29,10 +28,8 @@ const BloodRequest = ({ navigation }) => {
     const getHospitalList = () => {
         setLoading(true);
         axiosInstance.get('api/hospitals').then(res => {
-            console.log("res", res.data);
-
             setHospitalList(res.data);
-        }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
+        }).catch(err => console.log("error", err)).finally(() => setLoading(false));
     };
 
     const selectedDistrict = watch("district");

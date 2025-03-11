@@ -4,7 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import { bg_color, bloodGroups, dropdownArrow, Loading } from "../utils/utils";
+import { bg_color, bloodGroups, cities, dropdownArrow, Loading } from "../utils/utils";
 import { Picker } from "@react-native-picker/picker";
 import axiosInstance from "../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";

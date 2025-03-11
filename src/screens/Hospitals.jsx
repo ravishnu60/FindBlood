@@ -1,10 +1,12 @@
 import { useIsFocused } from "@react-navigation/native";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { View, Text, StyleSheet, FlatList } from "react-native";
 // import MapView, { Marker } from "react-native-maps";
 // import Geolocation from "react-native-geolocation-service";
 import { Avatar, Card } from "react-native-paper";
-import { axiosInstance } from "../utils/axiosInstance";
+import { iconBg, Loading } from "../utils/utils";
+import axiosInstance from "../utils/axiosInstance";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const hospitalsData = [
     { id: "1", name: "City Hospital", latitude: 37.7749, longitude: -122.4194, address: "123 Main St, San Francisco", phone: "123-456-7890" },
@@ -13,6 +15,8 @@ const hospitalsData = [
 ];
 
 const Hospitals = ({ navigation }) => {
+    const contextVal= useContext(ContextData);
+
     const [region, setRegion] = useState({
         latitude: 37.7749,
         longitude: -122.4194,
@@ -22,19 +26,7 @@ const Hospitals = ({ navigation }) => {
 
     const isFocused = useIsFocused();
     const [hospitalList, setHospitalList] = useState([]);
-
-    // const getRequest = () => {
-    //     axiosInstance.get('api/hospitals').then(res => {
-    //         setRequestList(res.data);
-    //         console.log("res", res.data);
-    //     }).catch(err => console.log("eror", err));
-    // }
-
-    // useEffect(() => {
-    //     if (isFocused) {
-    //         getRequest();
-    //     }
-    // }, [isFocused])
+    const [loading, setLoading] = useState(false);
 
     // useEffect(() => {
     //     Geolocation.getCurrentPosition(
@@ -51,8 +43,22 @@ const Hospitals = ({ navigation }) => {
     //     );
     // }, []);
 
+    const getRequest = () => {
+        setLoading(true);
+        axiosInstance.get('api/hospitals').then(res => {
+            setHospitalList(res?.data.filter(hospital => hospital.district === contextVal?.user?.district));
+        }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
+    }
+
+    useEffect(() => {
+        if (isFocused) {
+            getRequest();
+        }
+    }, [isFocused, contextVal?.user?.district]);
+
     return (
         <View style={styles.container}>
+            <Loading visible={loading} />
             <Text style={styles.title}>Nearby Hospitals & Blood Banks</Text>
             {/* <MapView style={styles.map} region={region}>
                 {hospitalsData.map((hospital) => (
@@ -66,15 +72,15 @@ const Hospitals = ({ navigation }) => {
                 ))}
             </MapView> */}
             <FlatList
-                data={hospitalsData}
+                data={hospitalList}
                 keyExtractor={(item) => item.id}
                 renderItem={({ item }) => (
                     <Card style={styles.card} onPress={() => navigation.navigate("HospitalDetails", { hospital: item })}>
                         <Card.Title
                             title={item.name}
                             titleStyle={{fontWeight: 'bold'}}
-                            subtitle={`Address: ${item.address} | Phone: ${item.phone}`}
-                            left={(props) => <Avatar.Icon {...props} icon="hospital-building" />}
+                            subtitle={`Address: ${item.district} | Phone: ${item.phone}`}
+                            left={(props) => <Avatar.Icon {...props} style={{backgroundColor: iconBg}} icon="hospital-building" />}
                         />
                     </Card>
                 )}
