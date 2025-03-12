@@ -27,7 +27,7 @@ const BloodRequest = ({ navigation }) => {
 
     const getHospitalList = () => {
         setLoading(true);
-        axiosInstance.get('api/hospitals').then(res => {
+        axiosInstance.get('hospitals').then(res => {
             setHospitalList(res.data);
         }).catch(err => console.log("error", err)).finally(() => setLoading(false));
     };
@@ -37,7 +37,7 @@ const BloodRequest = ({ navigation }) => {
 
     const onSubmit = (data) => {
         setLoading(true);
-        axiosInstance.post('api/store/blood-request', data).then(res => {
+        axiosInstance.post('store/blood-request', data).then(res => {
             console.log("res", res.data);
             Alert.alert("Success", "Blood request submitted successfully!");
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));

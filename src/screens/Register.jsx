@@ -33,7 +33,7 @@ const Register = ({ navigation }) => {
         setLoading(true);
         axiosInstance({
             method: "post",
-            url: "api/register",
+            url: "register",
             data: data
         }).then(res => {
             AsyncStorage.setItem('token', res.data.token);

@@ -1,40 +1,41 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Fontawesome from "react-native-vector-icons/FontAwesome";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
-import { bloodGroups, cities, dropdownArrow } from "../utils/utils";
+import { bloodGroups, cities, dropdownArrow, Loading } from "../utils/utils";
+import axiosInstance from "../utils/axiosInstance";
 
 const FindDonors = ({ navigation }) => {
-    const [bloodGroup, setBloodGroup] = useState("");
-    const [location, setLocation] = useState("");
     const [donors, setDonors] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const requestSchema = yup.object().shape({
         blood_group: yup.string().required("Blood Group is required"),
         district: yup.string().required("District is required"),
     });
 
-    const { control, handleSubmit, formState: { errors }, reset, watch } = useForm({
+    const { control, handleSubmit, formState: { errors }, reset } = useForm({
         resolver: yupResolver(requestSchema),
     });
 
 
     const handleSearch = (data) => {
-        console.log("Search Data:", data);
-        
-        // Dummy data for demonstration (replace with API call)
-        const dummyDonors = [
-            { id: "1", name: "John Doe", bloodGroup: "O+", location: "New York" },
-            { id: "2", name: "Alice Smith", bloodGroup: "A+", location: "Los Angeles" },
-        ];
-        setDonors(dummyDonors);
+        setLoading(true);
+        axiosInstance.get(`get/donor-list/${data.blood_group}/${data.district}`).then(res => {
+            setDonors(res.data?.totalRequest);
+        }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     };
 
+    useEffect(() => {
+        reset({});
+    }, []);
+    
     return (
         <View style={styles.container}>
+            <Loading visible={loading} />
             <Text style={styles.title}>Find Blood Donors</Text>
 
             <Text style={styles.label}>Blood Group *</Text>
@@ -87,8 +88,8 @@ const FindDonors = ({ navigation }) => {
                     <TouchableOpacity onPress={() => navigation.navigate("DonorDetails", { donor: item })} style={styles.list} >
                         <View style={styles.donorCard} >
                             <Text style={styles.donorName}>{item.name}</Text>
-                            <Text style={{ fontWeight: "bold" }}>Blood Group: <Text style={{ fontWeight: "bold", color: "#e74c3c" }}>{item.bloodGroup}</Text></Text>
-                            <Text style={{ fontWeight: "bold" }}>Location: <Text style={{ fontWeight: "normal", color: "#717171" }}>{item.location}</Text></Text>
+                            <Text style={{ fontWeight: "bold" }}>Blood Group: <Text style={{ fontWeight: "bold", color: "#e74c3c" }}>{item.blood_group}</Text></Text>
+                            <Text style={{ fontWeight: "bold" }}>Location: <Text style={{ fontWeight: "normal", color: "#717171" }}>{item.district}</Text></Text>
                         </View>
                         <Fontawesome name="arrow-right" size={25} color="#959595" />
                     </TouchableOpacity>
@@ -108,7 +109,7 @@ const styles = StyleSheet.create({
     button: { backgroundColor: "#e74c3c", padding: 15, borderRadius: 8, alignItems: "center", marginTop: 10 },
     buttonText: { color: "#fff", fontSize: 16, fontWeight: "bold" },
     donorCard: { flexDirection: "column", alignItems: "flex-start", rowGap: 5 },
-    donorName: { fontSize: 18, fontWeight: "bold" },
+    donorName: { fontSize: 16, fontWeight: "bold" },
     list: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10, backgroundColor: "#f2f2f2", marginTop: 10, borderRadius: 8, padding: 10 },
     error: { color: "red", marginBottom: 10 },
 });

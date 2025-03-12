@@ -5,7 +5,7 @@ export const iconBg= "#de2323";
 import { StyleSheet, Text, View } from "react-native";
 import { ActivityIndicator } from "react-native-paper";
 
-export const base_url = "https://3667-117-251-47-241.ngrok-free.app/";
+export const base_url = "https://c78a-182-60-18-230.ngrok-free.app/api/";
 
 export const Loading = ({ visible }) => {
     return (

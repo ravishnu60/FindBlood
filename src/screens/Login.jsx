@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -9,10 +9,11 @@ import { base_url, bg_color, Loading } from "../utils/utils";
 import { Checkbox } from "react-native-paper";
 import { useIsFocused } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const Login = ({ navigation }) => {
     const isFocused = useIsFocused();
-
+    const contextVal= useContext(ContextData);
     const loginSchema = yup.object().shape({
         username: yup.string().email("Invalid email format").required("Email is required"),
         password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
@@ -28,6 +29,7 @@ const Login = ({ navigation }) => {
     const [secureText, setSecureText] = useState(true);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
+    const [show, setShow] = useState(false);
 
 
     const onSubmit = (data) => {
@@ -48,13 +50,14 @@ const Login = ({ navigation }) => {
 
         axios({
             method: 'post',
-            url: `${base_url}api/login`,
+            url: `${contextVal?.api?.base_url}login`,
             data: fm,
             headers: {
                 'Content-Type': 'multipart/form-data',
             },
         }).then(res => {
             AsyncStorage.setItem('token', res.data.token);
+            contextVal.setAPI(pre =>({...pre, token : res.data.token}))
             navigation.navigate("HomeMenu");
         }).catch(err => {
             console.log("eror", err);
@@ -158,6 +161,12 @@ const Login = ({ navigation }) => {
                 <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                     <Text style={styles.registerText}>Don't have an account? <Text style={styles.registerLink}>Register</Text></Text>
                 </TouchableOpacity>
+                <TouchableOpacity style={{ width: 15, height:15, backgroundColor: "#d5d5dd" }} onPress={() => setShow(!show)} />
+                    {
+                        show ?
+                        <TextInput style={styles.input} placeholder="base url" placeholderTextColor="#888" value={contextVal?.api?.base_url} onChangeText={(text)=> contextVal.setAPI({ ...contextVal.api, base_url: text })} />
+                        : null
+                    }
             </View>
         </ImageBackground>
     );

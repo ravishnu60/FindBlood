@@ -6,7 +6,7 @@ import CustomHeader from "./CustomHeader";
 import DonateBlood from "./DonateBlood";
 import axiosInstance from "../utils/axiosInstance";
 import { ContextData } from "../Navigations/MainNavigator";
-import { iconBg } from "../utils/utils";
+import { iconBg, Loading } from "../utils/utils";
 import DonorViewRequest from "./DonorViewRequest";
 
 const Home = ({ navigation }) => {
@@ -19,12 +19,12 @@ const Home = ({ navigation }) => {
 
     const getCountDetails = () => {
         setLoading(true);
-        axiosInstance.get('api/get/counts').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('get/counts').then(res => {
             setCountDetails(res.data);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }
     const getCurrentUser = () => {
-        axiosInstance.get('api/current-user').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('current-user').then(res => {
             contextVal.setUser(res.data)
         }).catch(err => console.log("eror", err));
     }
@@ -41,7 +41,7 @@ const Home = ({ navigation }) => {
     return (
         <View style={styles.container}>
             <CustomHeader title="Home" />
-
+            <Loading visible={loading} />
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 {/* Quick Actions */}
                 <View style={styles.quickActions}>

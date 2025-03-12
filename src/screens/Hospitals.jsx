@@ -45,7 +45,7 @@ const Hospitals = ({ navigation }) => {
 
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('api/hospitals').then(res => {
+        axiosInstance.get('hospitals').then(res => {
             setHospitalList(res?.data.filter(hospital => hospital.district === contextVal?.user?.district));
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }

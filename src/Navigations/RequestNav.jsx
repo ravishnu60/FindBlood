@@ -8,9 +8,6 @@ import CustomHeader from '../screens/CustomHeader';
 function RequestNav({navigation}) {
     const Stack = createNativeStackNavigator();
 
-    useEffect(() => {
-        navigation.navigate('RequestBlood');
-    }, [])
     return (
         <View style={{ flex: 1 }}>
             <CustomHeader title="Requests" />

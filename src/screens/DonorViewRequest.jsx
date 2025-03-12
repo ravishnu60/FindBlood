@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, FlatList, StyleSheet } from "react-native";
+import { View, Text, FlatList, StyleSheet, Linking } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { bg_color, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
+import { Button } from "react-native-paper";
 
 const DonorViewRequest = ({ onClose }) => {
     const isFocused = useIsFocused();
@@ -13,7 +14,7 @@ const DonorViewRequest = ({ onClose }) => {
 
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('api/get/requests').then(res => {
+        axiosInstance.get('get/requests').then(res => {
             console.log(res.data);
 
             setRequestList(res?.data?.totalRequest);
@@ -67,22 +68,19 @@ const DonorViewRequest = ({ onClose }) => {
                 showsVerticalScrollIndicator={false}
                 renderItem={({ item }) => (
                     <View style={styles.card} onPress={() => navigation.navigate("RequestDetails", { request: item })}>
-                        <Fontisto name="blood-drop" size={35} color="#bc2d2d" />
-                        <View >
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Name: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item.name}</Text></Text>
-
-                            <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Blood: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item?.blood_requests?.[0]?.blood_group}</Text></Text>
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Level: <Text style={{ fontSize: 15, fontWeight: "bold", color: getUrgencyColor(item?.blood_requests?.[0]?.urgency) }}>{item?.blood_requests?.[0]?.urgency || 'Normal'} </Text></Text>
-                            </View>
-                            <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
-                                <Text style={{ marginRight: 10, fontWeight: "bold", }}> Hospital: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item?.blood_requests?.[0]?.hospital?.name}</Text></Text>
-                            </View>
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Place: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item?.blood_requests?.[0]?.hospital?.address} - {item?.blood_requests?.[0]?.hospital?.district}</Text></Text>
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Notes: <Text style={{ fontSize: 13, fontWeight: "normal" }}>{item?.blood_requests?.[0]?.additional_notes || 'No notes'}</Text></Text>
-                            <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Status: <Text style={{ fontSize: 15, fontWeight: "bold", color: getStatusColor(item?.blood_groups[0]?.status) }}>{item?.blood_requests?.[0]?.status === 'approved' ? 'Donated' : item?.blood_requests?.[0]?.status.charAt(0).toUpperCase() + item?.blood_requests?.[0]?.status.slice(1)}</Text></Text>
-                            {item?.donated_by && <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Donated by: <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item?.donated_by}</Text></Text>}
+                        <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Name: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item.name}</Text></Text>
+                        <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
+                            <Text style={{ marginRight: 10, fontWeight: "bold", }}> Blood: <Text style={{ fontSize: 15, fontWeight: "bold", color: "#901111" }}>{item?.blood_requests?.[0]?.blood_group}</Text></Text>
+                            <Text style={{ marginRight: 10, fontWeight: "bold", }}> Level: <Text style={{ fontSize: 15, fontWeight: "bold", color: getUrgencyColor(item?.blood_requests?.[0]?.urgency) }}>{item?.blood_requests?.[0]?.urgency || 'Normal'} </Text></Text>
                         </View>
+                        <View style={{ flexDirection: "row", columnGap: 20, alignItems: "center", marginBottom: 10 }} >
+                            <Text style={{ marginRight: 10, fontWeight: "bold", }}> Hospital: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item?.blood_requests?.[0]?.hospital?.name}</Text></Text>
+                        </View>
+                        <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Place: <Text style={{ fontSize: 14, fontWeight: "normal", color: "#5b5b5b" }}>{item?.blood_requests?.[0]?.hospital?.address} - {item?.blood_requests?.[0]?.hospital?.district}</Text></Text>
+                        <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Notes: <Text style={{ fontSize: 13, fontWeight: "normal" }}>{item?.blood_requests?.[0]?.additional_notes || 'No notes'}</Text></Text>
+                        <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Status: <Text style={{ fontSize: 15, fontWeight: "bold", color: getStatusColor(item?.blood_requests[0]?.status) }}>{item?.blood_requests?.[0]?.status === 'approved' ? 'Donated' : item?.blood_requests?.[0]?.status?.charAt(0)?.toUpperCase() + item?.blood_requests?.[0]?.status?.slice(1)}</Text></Text>
+                        {item?.donated_by && <Text style={{ marginRight: 10, fontWeight: "bold", marginBottom: 10 }}> Donated by: <Text style={{ fontSize: 15, fontWeight: "bold" }}>{item?.donated_by}</Text></Text>}
+                        <Button mode="contained" style={{ backgroundColor: "#1eb034", borderRadius: 10 }} onPress={()=> Linking.openURL(`tel:${item?.phone}`)}>Call</Button>
                     </View>
                 )}
             />
@@ -94,7 +92,7 @@ const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: bg_color, borderRadius: 5 },
     header: { flexDirection: "row", alignItems: "center", marginBottom: 15, columnGap: 25 },
     title: { fontSize: 22, fontWeight: "bold" },
-    card: { marginBottom: 15, padding: 10, paddingHorizontal: 20, borderRadius: 10, backgroundColor: "#f3f3f3", flexDirection: "row", alignItems: "center", columnGap: 20 },
+    card: { marginBottom: 15, padding: 10, paddingHorizontal: 20, borderRadius: 10, backgroundColor: "#f3f3f3" },
 });
 
 export default DonorViewRequest;

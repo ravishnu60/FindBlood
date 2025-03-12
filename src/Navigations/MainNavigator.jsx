@@ -9,9 +9,10 @@ export const ContextData= createContext();
 function MainNavigator() {
     const Stack = createNativeStackNavigator();
     const [user, setUser] = useState({});
+    const [api, setAPI]= useState({});
     return (
-        <ContextData.Provider value={{ user, setUser }}>
-        <Stack.Navigator initialRouteName='HomeMenu' screenOptions={{ headerShown: false }}>
+        <ContextData.Provider value={{ user, setUser, api, setAPI }}>
+        <Stack.Navigator initialRouteName='Login' screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Login" component={Login} />
             <Stack.Screen name="Register" component={Register} />
             <Stack.Screen name="HomeMenu" component={BottomTabs} />

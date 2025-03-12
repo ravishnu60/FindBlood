@@ -28,7 +28,7 @@ const DonateBlood = ({ onClose, currUser }) => {
         setLoading(true);
         axiosInstance({
             method: "POST",
-            url: "api/become-donor",
+            url: "become-donor",
             data: data
         }).then((res) => {
             console.log(res);

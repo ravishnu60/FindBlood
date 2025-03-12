@@ -12,7 +12,7 @@ const Requests = ({ navigation }) => {
 
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('api/blood-requests').then(res => {
+        axiosInstance.get('blood-requests').then(res => {
             setRequestList(res.data);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }
