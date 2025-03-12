@@ -22,6 +22,7 @@ const axiosInstance = ({baseURL}) => {
             return Promise.reject(error);
         }
     )
+    return axiosVar
 }
 
 export default axiosInstance

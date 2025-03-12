@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet, Linking } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import Fontisto from "react-native-vector-icons/Fontisto";
@@ -6,15 +6,17 @@ import FontAwesome from "react-native-vector-icons/FontAwesome";
 import { bg_color, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
 import { Button } from "react-native-paper";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const DonorViewRequest = ({ onClose }) => {
     const isFocused = useIsFocused();
     const [requestList, setRequestList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const contextVal = useContext(ContextData);
 
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('get/requests').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('get/requests').then(res => {
             console.log(res.data);
 
             setRequestList(res?.data?.totalRequest);

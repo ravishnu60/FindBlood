@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useContext, useEffect, useMemo, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -7,6 +7,7 @@ import { Picker } from "@react-native-picker/picker";
 import { useIsFocused } from "@react-navigation/native";
 import { bloodGroups, cities, dropdownArrow } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const requestSchema = yup.object().shape({
     blood_group: yup.string().required("Blood Group is required"),
@@ -16,6 +17,7 @@ const requestSchema = yup.object().shape({
 });
 
 const BloodRequest = ({ navigation }) => {
+    const contextVal = useContext(ContextData);
 
     const isFocused = useIsFocused();
     const [hospitalList, setHospitalList] = useState([]);
@@ -27,7 +29,7 @@ const BloodRequest = ({ navigation }) => {
 
     const getHospitalList = () => {
         setLoading(true);
-        axiosInstance.get('hospitals').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('hospitals').then(res => {
             setHospitalList(res.data);
         }).catch(err => console.log("error", err)).finally(() => setLoading(false));
     };
@@ -37,7 +39,7 @@ const BloodRequest = ({ navigation }) => {
 
     const onSubmit = (data) => {
         setLoading(true);
-        axiosInstance.post('store/blood-request', data).then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).post('store/blood-request', data).then(res => {
             console.log("res", res.data);
             Alert.alert("Success", "Blood request submitted successfully!");
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));

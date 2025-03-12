@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useIsFocused } from "@react-navigation/native";
 import Fontisto from "react-native-vector-icons/Fontisto";
 import { bg_color, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const Requests = ({ navigation }) => {
     const isFocused = useIsFocused();
     const [requestList, setRequestList] = useState([]);
     const [loading, setLoading] = useState(false);
+    const contextVal = useContext(ContextData);
 
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('blood-requests').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('blood-requests').then(res => {
             setRequestList(res.data);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }

@@ -16,36 +16,13 @@ const hospitalsData = [
 
 const Hospitals = ({ navigation }) => {
     const contextVal= useContext(ContextData);
-
-    const [region, setRegion] = useState({
-        latitude: 37.7749,
-        longitude: -122.4194,
-        latitudeDelta: 0.05,
-        longitudeDelta: 0.05,
-    });
-
     const isFocused = useIsFocused();
     const [hospitalList, setHospitalList] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // useEffect(() => {
-    //     Geolocation.getCurrentPosition(
-    //         position => {
-    //             setRegion({
-    //                 latitude: position.coords.latitude,
-    //                 longitude: position.coords.longitude,
-    //                 latitudeDelta: 0.05,
-    //                 longitudeDelta: 0.05,
-    //             });
-    //         },
-    //         error => console.log(error),
-    //         { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
-    //     );
-    // }, []);
-
     const getRequest = () => {
         setLoading(true);
-        axiosInstance.get('hospitals').then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get('hospitals').then(res => {
             setHospitalList(res?.data.filter(hospital => hospital.district === contextVal?.user?.district));
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     }

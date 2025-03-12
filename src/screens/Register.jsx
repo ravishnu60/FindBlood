@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ImageBackground, Alert } from "react-native";
 import { useForm, Controller } from "react-hook-form";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -8,10 +8,12 @@ import { bg_color, bloodGroups, cities, dropdownArrow, Loading } from "../utils/
 import { Picker } from "@react-native-picker/picker";
 import axiosInstance from "../utils/axiosInstance";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const Register = ({ navigation }) => {
     const [secureText, setSecureText] = useState(true);
     const [loading, setLoading] = useState(false);
+    const contextVal = useContext(ContextData);
 
     const registerSchema = yup.object().shape({
         name: yup.string().required("Name is required"),
@@ -31,7 +33,7 @@ const Register = ({ navigation }) => {
 
         console.log("Register Data:", data);
         setLoading(true);
-        axiosInstance({
+        axiosInstance({baseURL: contextVal?.api?.base_url})({
             method: "post",
             url: "register",
             data: data

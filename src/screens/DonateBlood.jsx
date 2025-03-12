@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import { useForm, Controller } from "react-hook-form";
@@ -6,8 +6,10 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { bloodGroups, cities, dropdownArrow, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const DonateBlood = ({ onClose, currUser }) => {
+    const contextVal = useContext(ContextData);
     const [loading, setLoading] = useState(false);
     // Validation Schema
     const donateSchema = yup.object().shape({
@@ -26,7 +28,7 @@ const DonateBlood = ({ onClose, currUser }) => {
 
     const onSubmit = (data) => {
         setLoading(true);
-        axiosInstance({
+        axiosInstance({baseURL: contextVal?.api?.base_url})({
             method: "POST",
             url: "become-donor",
             data: data

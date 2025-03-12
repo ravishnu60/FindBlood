@@ -13,7 +13,7 @@ import { ContextData } from "../Navigations/MainNavigator";
 
 const Login = ({ navigation }) => {
     const isFocused = useIsFocused();
-    const contextVal= useContext(ContextData);
+    const contextVal = useContext(ContextData);
     const loginSchema = yup.object().shape({
         username: yup.string().email("Invalid email format").required("Email is required"),
         password: yup.string().min(6, "Password must be at least 6 characters").required("Password is required"),
@@ -31,6 +31,12 @@ const Login = ({ navigation }) => {
     const [error, setError] = useState("");
     const [show, setShow] = useState(false);
 
+    const setBaseURL = async () => {
+        const url = await AsyncStorage.getItem("base_url");
+        if (url) {
+            contextVal.setAPI(pre => ({ ...pre, base_url: url }))
+        }
+    }
 
     const onSubmit = (data) => {
         setLoading(true);
@@ -56,8 +62,9 @@ const Login = ({ navigation }) => {
                 'Content-Type': 'multipart/form-data',
             },
         }).then(res => {
+            AsyncStorage.setItem("base_url", contextVal?.api?.base_url);
             AsyncStorage.setItem('token', res.data.token);
-            contextVal.setAPI(pre =>({...pre, token : res.data.token}))
+            contextVal.setAPI(pre => ({ ...pre, token: res.data.token }))
             navigation.navigate("HomeMenu");
         }).catch(err => {
             console.log("eror", err);
@@ -83,6 +90,7 @@ const Login = ({ navigation }) => {
         if (isFocused) {
             patchValueIfExist();
             reset();
+            setBaseURL();
         }
     }, [isFocused])
 
@@ -161,12 +169,12 @@ const Login = ({ navigation }) => {
                 <TouchableOpacity onPress={() => navigation.navigate("Register")}>
                     <Text style={styles.registerText}>Don't have an account? <Text style={styles.registerLink}>Register</Text></Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={{ width: 15, height:15, backgroundColor: "#d5d5dd" }} onPress={() => setShow(!show)} />
-                    {
-                        show ?
-                        <TextInput style={styles.input} placeholder="base url" placeholderTextColor="#888" value={contextVal?.api?.base_url} onChangeText={(text)=> contextVal.setAPI({ ...contextVal.api, base_url: text })} />
+                <TouchableOpacity style={{ width: 15, height: 15, backgroundColor: "#d5d5dd" }} onPress={() => setShow(!show)} />
+                {
+                    show ?
+                        <TextInput style={styles.input} placeholder="base url" placeholderTextColor="#888" value={contextVal?.api?.base_url} onChangeText={(text) => contextVal.setAPI({ ...contextVal.api, base_url: text })} />
                         : null
-                    }
+                }
             </View>
         </ImageBackground>
     );

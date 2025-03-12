@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, FlatList } from "react-native";
 import { Picker } from "@react-native-picker/picker";
 import Fontawesome from "react-native-vector-icons/FontAwesome";
@@ -7,10 +7,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import * as yup from "yup";
 import { bloodGroups, cities, dropdownArrow, Loading } from "../utils/utils";
 import axiosInstance from "../utils/axiosInstance";
+import { ContextData } from "../Navigations/MainNavigator";
 
 const FindDonors = ({ navigation }) => {
     const [donors, setDonors] = useState([]);
     const [loading, setLoading] = useState(false);
+    const contextVal = useContext(ContextData);
 
     const requestSchema = yup.object().shape({
         blood_group: yup.string().required("Blood Group is required"),
@@ -24,7 +26,7 @@ const FindDonors = ({ navigation }) => {
 
     const handleSearch = (data) => {
         setLoading(true);
-        axiosInstance.get(`get/donor-list/${data.blood_group}/${data.district}`).then(res => {
+        axiosInstance({baseURL: contextVal?.api?.base_url}).get(`get/donor-list/${data.blood_group}/${data.district}`).then(res => {
             setDonors(res.data?.totalRequest);
         }).catch(err => console.log("eror", err)).finally(() => setLoading(false));
     };
